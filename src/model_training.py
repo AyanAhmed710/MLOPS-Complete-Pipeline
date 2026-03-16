@@ -4,6 +4,7 @@ import numpy as np
 from sklearn.ensemble import RandomForestClassifier
 import logging
 import pickle
+import yaml
 
 log_dir="./LOG"
 os.makedirs(log_dir , exist_ok=True)
@@ -25,6 +26,18 @@ file_handler.setFormatter(formatter)
 
 logger.addHandler(console_handler)
 logger.addHandler(file_handler)
+
+def load_params(params_path):
+    try:
+        with open(params_path , 'r') as file:
+           params= yaml.safe_load(file)
+
+        logger.info("Params has been successfully Loaded")
+
+        return params
+
+    except Exception as e:
+        logger.error(f"File is not been able to open {e}")
 
 def load_data(file_path):
     try:
@@ -67,7 +80,8 @@ def save_model(model ,file_path):
 
 def main():
     try:
-     params = {"n_estimators" :25 , "random_state" :2}
+     params=load_params(r"D:\MLOPS\MLOPS-Pipeline-Project\MLOPS-Complete-Pipeline\params.yaml")
+     params = {"n_estimators" :params["model_training"]["n_estimators"] , "random_state" :params["model_training"]["random_state"]}
      train_df=load_data(r"D:\MLOPS\MLOPS-Pipeline-Project\MLOPS-Complete-Pipeline\data\tfidf_processed\train_df_idf.csv")
      X_train =train_df.iloc[: , :-1]
      Y_train=train_df.iloc[: , -1]

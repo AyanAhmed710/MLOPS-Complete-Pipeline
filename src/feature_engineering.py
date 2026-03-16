@@ -2,6 +2,7 @@ import os
 import pandas as pd
 import nltk
 import logging
+import yaml
 
 from sklearn.feature_extraction.text import CountVectorizer , TfidfVectorizer
 nltk.download("stopwords")
@@ -28,6 +29,17 @@ file_handler.setFormatter(formatter)
 logger.addHandler(console_handler)
 logger.addHandler(file_handler)
 
+def load_params(params_path):
+    try:
+        with open(params_path , 'r') as file:
+           params= yaml.safe_load(file)
+
+        logger.info("Params has been successfully Loaded")
+
+        return params
+
+    except Exception as e:
+        logger.error(f"File is not been able to open {e}")
 
 def load_data(file_path):
    try:
@@ -86,11 +98,13 @@ def save_data(df , file_path):
 def main():
    
    try:
+    params=load_params(r"D:\MLOPS\MLOPS-Pipeline-Project\MLOPS-Complete-Pipeline\params.yaml")
+    max_features=params["feature_engineering"]["max_features"]
    
     train_data=load_data(file_path=r"D:\MLOPS\MLOPS-Pipeline-Project\MLOPS-Complete-Pipeline\data\processed_data\preprocessed_train_data.csv")
     test_data=load_data(file_path=r"D:\MLOPS\MLOPS-Pipeline-Project\MLOPS-Complete-Pipeline\data\processed_data\preprocessed_test_data.csv")
 
-    train_df ,test_df = apply_tfidf(train_data=train_data,test_data=test_data,max_features=50)
+    train_df ,test_df = apply_tfidf(train_data=train_data,test_data=test_data,max_features=max_features)
 
     tfidf_dir="./data/tfidf_processed"
     os.makedirs(tfidf_dir,exist_ok=True)

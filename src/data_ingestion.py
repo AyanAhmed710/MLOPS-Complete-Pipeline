@@ -2,6 +2,7 @@ import logging
 import os
 import pandas as pd
 from sklearn.model_selection import train_test_split
+import yaml
 
 log_dir="./LOG"
 os.makedirs(log_dir , exist_ok=True)
@@ -23,6 +24,20 @@ file_handler.setFormatter(formatter)
 
 logger.addHandler(console_handler)
 logger.addHandler(file_handler)
+
+def load_params(params_path):
+    try:
+        with open(params_path , 'r') as file:
+           params= yaml.safe_load(file)
+
+        logger.info("Params has been successfully Loaded")
+
+        return params
+
+    except Exception as e:
+        logger.error(f"File is not been able to open {e}")
+
+
 
 def load_data(data_url : str) -> pd.DataFrame:
     try :
@@ -61,7 +76,8 @@ def save_data(train_data : pd.DataFrame,test_data : pd.DataFrame,data_path):
 
 def main():
     try:
-     test_size=0.20
+     params=load_params(r"D:\MLOPS\MLOPS-Pipeline-Project\MLOPS-Complete-Pipeline\params.yaml")
+     test_size=params['data_ingestion']["test_size"]
      random_state=42
      data_path='https://raw.githubusercontent.com/vikashishere/Datasets/main/spam.csv'
      df=load_data(data_url=data_path)
