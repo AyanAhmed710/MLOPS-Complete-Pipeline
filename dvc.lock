@@ -9,11 +9,11 @@ stages:
       size: 3019
     params:
       params.yaml:
-        data_ingestion.test_size: 0.3
+        data_ingestion.test_size: 0.15
     outs:
     - path: data/raw
       hash: md5
-      md5: 506021b2951b5a642d0d50e6e224e825.dir
+      md5: e0ca0360b13b8deedbf58bd1670a9a90.dir
       size: 484846
       nfiles: 2
   data_preprocessing:
@@ -21,7 +21,7 @@ stages:
     deps:
     - path: data/raw
       hash: md5
-      md5: 506021b2951b5a642d0d50e6e224e825.dir
+      md5: e0ca0360b13b8deedbf58bd1670a9a90.dir
       size: 484846
       nfiles: 2
     - path: src/data_preprocessing.py
@@ -31,16 +31,16 @@ stages:
     outs:
     - path: data/processed_data
       hash: md5
-      md5: d16ba30d7c4c2136e325dd3ce21a3f83.dir
-      size: 263911
+      md5: a8d1ea456abc3ba53fdad19a1dd96da6.dir
+      size: 260945
       nfiles: 2
   feature_engineering:
     cmd: python src/feature_engineering.py
     deps:
     - path: data/processed_data
       hash: md5
-      md5: d16ba30d7c4c2136e325dd3ce21a3f83.dir
-      size: 263911
+      md5: a8d1ea456abc3ba53fdad19a1dd96da6.dir
+      size: 260945
       nfiles: 2
     - path: src/feature_engineering.py
       hash: md5
@@ -48,20 +48,20 @@ stages:
       size: 3390
     params:
       params.yaml:
-        feature_engineering.max_features: 50
+        feature_engineering.max_features: 65
     outs:
     - path: data/tfidf_processed
       hash: md5
-      md5: 9450948c0f8c6d7c43b560d230444f80.dir
-      size: 1193019
+      md5: a4ad572d1e6678f242978728855c2a21.dir
+      size: 1522314
       nfiles: 2
   model_training:
     cmd: python src/model_training.py
     deps:
     - path: data/tfidf_processed
       hash: md5
-      md5: 9450948c0f8c6d7c43b560d230444f80.dir
-      size: 1193019
+      md5: a4ad572d1e6678f242978728855c2a21.dir
+      size: 1522314
       nfiles: 2
     - path: src/model_training.py
       hash: md5
@@ -69,20 +69,20 @@ stages:
       size: 2941
     params:
       params.yaml:
-        model_training.n_estimators: 50
+        model_training.n_estimators: 30
         model_training.random_state: 2
     outs:
     - path: models/Random_Forest_Classifier.pkl
       hash: md5
-      md5: 9ad7fa7899bcf2fbd83a483289b4b6b1
-      size: 1909692
+      md5: 0715ea6bffdd943ce084f5b91b902238
+      size: 1426097
   model_evaluation:
     cmd: python src/model_evaluate.py
     deps:
     - path: models/Random_Forest_Classifier.pkl
       hash: md5
-      md5: 9ad7fa7899bcf2fbd83a483289b4b6b1
-      size: 1909692
+      md5: 0715ea6bffdd943ce084f5b91b902238
+      size: 1426097
     - path: src/model_evaluate.py
       hash: md5
       md5: ecca6721e72e9f4f7b755e6aed5f278d
