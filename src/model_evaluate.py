@@ -4,6 +4,9 @@ from sklearn.metrics import accuracy_score , precision_score ,recall_score ,roc_
 import logging 
 import pickle
 import json
+import yaml
+from dvclive import Live
+
 
 log_dir="./LOG"
 os.makedirs(log_dir , exist_ok=True)
@@ -25,6 +28,18 @@ file_handler.setFormatter(formatter)
 
 logger.addHandler(console_handler)
 logger.addHandler(file_handler)
+
+def load_params(params_path):
+    try:
+        with open(params_path , 'r') as file:
+           params= yaml.safe_load(file)
+
+        logger.info("Params has been successfully Loaded")
+
+        return params
+
+    except Exception as e:
+        logger.error(f"File is not been able to open {e}")
 
 
 def load_data(file_path):
@@ -48,7 +63,7 @@ def load_model(model_path):
         logger.error(f"Model is not been able to load")
 
 
-def evaluate_model(X_test ,Y_test ,model):
+def evaluate_model(X_test ,Y_test ,model,params):
     try:
         y_pred=model.predict(X_test)
 
@@ -56,6 +71,12 @@ def evaluate_model(X_test ,Y_test ,model):
         precision=precision_score(Y_test , y_pred)
         recall=recall_score(Y_test , y_pred)
         roc_auc=roc_auc_score(Y_test , y_pred)
+
+        with Live(save_dvc_exp=True) as live:
+            live.log_metric('accuracy' , accuracy)
+            live.log_metric('precision' , precision)
+            live.log_metric("recall" ,recall)
+            live.log_param(params)
 
         metrics_dict = {"accuracy" :accuracy , "pricision" :precision , "recall" :recall ,"auc" :roc_auc}
         logging.info("Metrics has been generated Successfully")
@@ -82,11 +103,17 @@ def save_metrics(file_path,metrics):
 
 def main():
     try:
+     params=load_params(r"D:\MLOPS\MLOPS-Pipeline-Project\MLOPS-Complete-Pipeline\params.yaml")
      df_test =load_data(r"D:\MLOPS\MLOPS-Pipeline-Project\MLOPS-Complete-Pipeline\data\tfidf_processed\test_df_idf.csv")
      model=load_model(r"D:\MLOPS\MLOPS-Pipeline-Project\MLOPS-Complete-Pipeline\models\Random_Forest_Classifier.pkl")
      X_test=df_test.iloc[: , :-1]
      Y_test = df_test.iloc[:,-1]
-     metrics_dict=evaluate_model(Y_test=Y_test ,X_test=X_test ,model=model)
+     metrics_dict=evaluate_model(Y_test=Y_test ,X_test=X_test ,model=model,params=params)
+
+     
+
+
+    
      report_dir="./reports"
      os.makedirs(report_dir,exist_ok=True)
      save_metrics(os.path.join(report_dir , "Random_Forest1.json") , metrics_dict)
