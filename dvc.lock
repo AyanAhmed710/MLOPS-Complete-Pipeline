@@ -1,0 +1,84 @@
+schema: '2.0'
+stages:
+  data_ingestion:
+    cmd: python src/data_ingestion.py
+    deps:
+    - path: src/data_ingestion.py
+      hash: md5
+      md5: 66c0ba0e5df4bd8afb7dc5a9d4e7e839
+      size: 2564
+    outs:
+    - path: data/raw
+      hash: md5
+      md5: 3b3cf3a9ca588cc150553eee569b3fe3.dir
+      size: 484846
+      nfiles: 2
+  data_preprocessing:
+    cmd: python src/data_preprocessing.py
+    deps:
+    - path: data/raw
+      hash: md5
+      md5: 3b3cf3a9ca588cc150553eee569b3fe3.dir
+      size: 484846
+      nfiles: 2
+    - path: src/data_preprocessing.py
+      hash: md5
+      md5: cccf9acd8a29ab6005d34716e2a6588b
+      size: 2931
+    outs:
+    - path: data/processed_data
+      hash: md5
+      md5: 0a97884114dd1754e28b6f440fa2635d.dir
+      size: 261909
+      nfiles: 2
+  feature_engineering:
+    cmd: python src/feature_engineering.py
+    deps:
+    - path: data/processed_data
+      hash: md5
+      md5: 0a97884114dd1754e28b6f440fa2635d.dir
+      size: 261909
+      nfiles: 2
+    - path: src/feature_engineering.py
+      hash: md5
+      md5: ab52be21e356b86a4deab84828692c94
+      size: 2901
+    outs:
+    - path: data/tfidf_processed
+      hash: md5
+      md5: a649a4d53819b70ec4b0b6e10f374e19.dir
+      size: 1186348
+      nfiles: 2
+  model_training:
+    cmd: python src/model_training.py
+    deps:
+    - path: data/tfidf_processed
+      hash: md5
+      md5: a649a4d53819b70ec4b0b6e10f374e19.dir
+      size: 1186348
+      nfiles: 2
+    - path: src/model_training.py
+      hash: md5
+      md5: 38c7f15bb4ad7a5a8aef5e147da807f8
+      size: 2446
+    outs:
+    - path: models/Random_Forest_Classifier.pkl
+      hash: md5
+      md5: 50c7a49cadba4545f6077e398fc51325
+      size: 1052220
+  model_evaluation:
+    cmd: python src/model_evaluate.py
+    deps:
+    - path: models/Random_Forest_Classifier.pkl
+      hash: md5
+      md5: 50c7a49cadba4545f6077e398fc51325
+      size: 1052220
+    - path: src/model_evaluate.py
+      hash: md5
+      md5: 782630d795c025ee33059e3331c7efaa
+      size: 2982
+    outs:
+    - path: reports/Random_Forest1.json
+      hash: md5
+      md5: 00022f2f678995cc4bd428b5cc2ac22e
+      size: 144
